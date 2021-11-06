@@ -129,6 +129,9 @@ def query(request: HttpRequest):
                 progress = 0.0
             return on_success({"type": "processing", "progress": progress})
         if task.status == "finish":
+            err_path = os.path.join(task.get_dirname(), "error.txt")
+            if os.path.exists(err_path):
+                raise MessageException('\n'.join(open(err_path).readlines()))
             return on_success({"type": "finish"})
 
     except Exception as e:
@@ -140,6 +143,20 @@ def query(request: HttpRequest):
 def download(request: HttpRequest):
     try:
         task_id = check_param("task_id", request.GET, required_type=int)
+        task = Task.objects.get(task_id=int(task_id))
+
+        if task.status != "finish":
+            raise MessageException("Task doesn't finish!")
+
+        dirname = task.get_dirname()
+        name = list(filter(lambda x: x.endswith("mp4"), os.listdir(dirname)))[0]
+
+        file = open(os.path.join(dirname, name), 'rb')
+        response = FileResponse(file)
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="%s"' % name
+        return response
+
 
     except Exception as e:
         return on_error(e)
