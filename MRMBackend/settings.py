@@ -33,7 +33,7 @@ SECRET_KEY = open(os.path.join(BASE_DIR, 'secret.txt')).readlines()[0].strip()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
