@@ -1,0 +1,5 @@
+secret.txt
+data
+*.sqlite3
+migrations
+*.jar
