@@ -18,11 +18,11 @@ from django.urls import path
 import app.views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/upload', app.views.upload),
-    path('api/generate', app.views.generate),
-    path('api/query', app.views.query),
-    path('api/download', app.views.download),
-    path('api/finish_task', app.views.private_finish_task),
-    path('api/pop_queue', app.views.private_pop_queue),
+    path('mania/admin/', admin.site.urls),
+    path('mania/api/upload', app.views.upload),
+    path('mania/api/generate', app.views.generate),
+    path('mania/api/query', app.views.query),
+    path('mania/api/download', app.views.download),
+    path('mania/api/finish_task', app.views.private_finish_task),
+    path('mania/api/pop_queue', app.views.private_pop_queue),
 ]
