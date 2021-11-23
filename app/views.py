@@ -28,8 +28,7 @@ def on_error(exception: Exception):
 
 
 def on_success(obj: dict):
-    obj.update({"status": "OK", "error_message": ""})
-    return JsonResponse(obj)
+    return JsonResponse({"status": "OK", "error_message": "", "data": obj})
 
 
 def check_param(key: str, container: dict, range=None, required_type=None):

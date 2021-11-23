@@ -16,7 +16,9 @@
 {
   "status": "OK", 
   "error_message": "", // valid when status != "OK"
-  "file_id": "xxx"
+  "data": {
+    "file_id": "xxx"
+  }
 }
 ```
 
@@ -36,7 +38,7 @@
 #### return
 ```
 {
-  "status": "OK", "error_message": "", "task_id": "xxx"
+  "status": "OK", "error_message": "", "data": {"task_id": "xxx"}
 }
 ```
 
@@ -54,8 +56,10 @@
 {
   "status": "OK",
   "error_message": "",
-  "type": "queue",
-  "count": 3
+  "data": {
+    "type": "queue",
+    "count": 3
+  }
 }
 ```
 - Processing
@@ -63,8 +67,10 @@
 {
   "status": "OK",
   "error_message": "",
-  "type": "processing",
-  "progress": 47.55
+  "data": {
+    "type": "processing",
+    "progress": 47.55
+  }
 }
 ```
 - Finish
@@ -72,7 +78,9 @@
 {
   "status": "OK",
   "error_message": "",
-  "type": "finish"
+  "data": {
+    "type": "finish"
+  }
 }
 ```
 

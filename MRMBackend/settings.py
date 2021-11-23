@@ -22,7 +22,7 @@ WORKING_ROOT = BASE_DIR.joinpath("data", "working")
 
 MRM_PATH = BASE_DIR.joinpath("ManiaReplayMaster.jar")
 
-MAX_RUNNING_TASK = 100
+MAX_RUNNING_TASK = 1
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
