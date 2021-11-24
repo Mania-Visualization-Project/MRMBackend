@@ -1,26 +1,27 @@
 # Create your views here.
 import json
 import os
-import multiprocessing
 
 from django.http import *
 from django.utils import timezone
 from django.views.decorators.csrf import *
 from django.views.decorators.http import require_http_methods
 
-from .models import ManiaFile, Task
-from .worker import start_render
 from MRMBackend import settings
+from . import util
+from .models import ManiaFile, Task, Event
 
 
 class MessageException(Exception):
     def __init__(self, msg):
         self.msg = msg
 
+
 def get_ip(request: HttpRequest):
     if "HTTP_X_FORWARDED_FOR" in request.META:
         return request.META["HTTP_X_FORWARDED_FOR"]
     return request.META.get("REMOTE_ADDR", None)
+
 
 def on_error(exception: Exception):
     if type(exception) == MessageException:
@@ -28,6 +29,7 @@ def on_error(exception: Exception):
     else:
         import traceback
         msg = traceback.format_exc()
+        Event(event_type="crash", event_message=msg).save()
     return JsonResponse({"status": "error", "error_message": msg})
 
 
@@ -99,14 +101,10 @@ def generate(request: HttpRequest):
 
         task = Task(status="queue", start_time=timezone.now(), extras=json.dumps(extras),
                     beatmap_file=map_file, replay_file=replay_file, music_file=bgm_file,
-                    ip=get_ip(request))
+                    ip=get_ip(request), activate_time=timezone.now())
         task.save()
 
-        p = multiprocessing.Process(target=start_render,
-                                    args=(settings.SECRET_KEY,
-                                          request.get_raw_uri().replace("generate", ""),
-                                          settings.MRM_PATH))
-        p.start()
+        util.start_render_process(request)
 
         return on_success({"task_id": str(task.task_id)})
 
@@ -121,9 +119,13 @@ def query(request: HttpRequest):
         task_id = check_param("task_id", request.GET, required_type=int)
         task = Task.objects.get(task_id=int(task_id))
 
-        # queue, processing, finish
+        util.check_too_long_task(request)
+
+        # queue, processing, finish, error
         if task.status == "queue":
             running_count = len(list(Task.objects.filter(status="processing")))
+            task.activate_time = timezone.now()
+            task.save(force_update=True)
             return on_success({"type": "queue", "count": running_count})
         if task.status == "processing":
             path = os.path.join(task.get_dirname(), "progress.txt")
@@ -179,8 +181,18 @@ def check_private_call(request: HttpRequest):
 def private_pop_queue(request: HttpRequest):
     try:
         check_private_call(request)
-        assert len(Task.objects.filter(status="processing")) < settings.MAX_RUNNING_TASK
-        task = Task.objects.filter(status="queue").order_by("-start_time")[0]
+        if Task.objects.filter(status="processing").count() >= settings.MAX_RUNNING_TASK:
+            raise MessageException("too much working processes!")
+        task = None
+        for t in Task.objects.filter(status="queue").order_by("-start_time"):
+            if t.activate_time is not None and (timezone.now() - t.activate_time).seconds >= 60:
+                t.set_to_error("connection close")
+                t.save(force_update=True)
+            else:
+                task = t
+                break
+        if task is None:
+            raise MessageException("no task to run!")
         task.status = "processing"
         map = task.beatmap_file.get_path()
         replay = task.replay_file.get_path()
@@ -207,6 +219,9 @@ def private_finish_task(request: HttpRequest):
         task.status = "finish" if task.get_output_name() is not None else "error"
         task.end_time = timezone.now()
         task.save(force_update=True)
+
+        util.clean()
+
         return on_success({})
     except Exception as e:
         return on_error(e)

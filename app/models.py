@@ -1,6 +1,7 @@
 import os
 
 from django.db import models
+from django.utils import timezone
 
 from MRMBackend import settings
 
@@ -24,9 +25,11 @@ class ManiaFile(models.Model):
 
 class Task(models.Model):
     task_id = models.AutoField(primary_key=True)
-    status = models.TextField()  # ['queue', 'processing', 'finish']
+    status = models.TextField()  # ['queue', 'processing', 'finish', 'error']
+    error_reason = models.TextField(null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(null=True)
+    activate_time = models.DateTimeField(null=True)
     extras = models.TextField()
     ip = models.TextField(null=True)
     beatmap_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='map')
@@ -46,3 +49,19 @@ class Task(models.Model):
         if len(lst) > 0:
             return lst[0]
         return None
+
+    def set_to_error(self, reason):
+        self.status = "error"
+        self.error_reason = reason
+        self.end_time = timezone.now()
+        err_path = os.path.join(self.get_dirname(), "error.txt")
+        if not os.path.exists(err_path):
+            with open(err_path, "w") as f:
+                f.write(reason)
+
+
+class Event(models.Model):
+    event_id = models.AutoField(primary_key=True)
+    event_type = models.TextField()
+    event_message = models.TextField()
+    time = models.DateTimeField(null=True, auto_now=True)
