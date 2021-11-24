@@ -93,7 +93,7 @@ def generate(request: HttpRequest):
         check_file_type(replay_file, "replay")
         extras = check_param("extra", data, required_type=dict)
 
-        task = Task(status="queue", start_time=timezone.now(), extras=extras,
+        task = Task(status="queue", start_time=timezone.now(), extras=json.dumps(extras),
                     beatmap_file=map_file, replay_file=replay_file, music_file=bgm_file)
         task.save()
 
