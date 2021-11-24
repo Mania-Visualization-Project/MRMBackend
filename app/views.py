@@ -17,6 +17,10 @@ class MessageException(Exception):
     def __init__(self, msg):
         self.msg = msg
 
+def get_ip(request: HttpRequest):
+    if "HTTP_X_FORWARDED_FOR" in request.META:
+        return request.META["HTTP_X_FORWARDED_FOR"]
+    return request.META.get("REMOTE_ADDR", None)
 
 def on_error(exception: Exception):
     if type(exception) == MessageException:
@@ -56,7 +60,7 @@ def upload(request: HttpRequest):
         name = obj.name
 
         maniaFile = ManiaFile(file_type=file_type, file_name=name,
-                              save_time=timezone.now())
+                              save_time=timezone.now(), ip=get_ip(request))
         maniaFile.save()
 
         with open(maniaFile.get_path(), 'wb') as f:
@@ -94,7 +98,8 @@ def generate(request: HttpRequest):
         extras = check_param("extra", data, required_type=dict)
 
         task = Task(status="queue", start_time=timezone.now(), extras=json.dumps(extras),
-                    beatmap_file=map_file, replay_file=replay_file, music_file=bgm_file)
+                    beatmap_file=map_file, replay_file=replay_file, music_file=bgm_file,
+                    ip=get_ip(request))
         task.save()
 
         p = multiprocessing.Process(target=start_render,
@@ -200,6 +205,7 @@ def private_finish_task(request: HttpRequest):
         task_id = check_param('task_id', request.POST)
         task = Task.objects.get(task_id=task_id)
         task.status = "finish" if task.get_output_name() is not None else "error"
+        task.end_time = timezone.now()
         task.save(force_update=True)
         return on_success({})
     except Exception as e:

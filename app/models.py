@@ -10,6 +10,7 @@ class ManiaFile(models.Model):
     file_type = models.CharField(max_length=16)
     file_name = models.CharField(max_length=256)
     save_time = models.DateTimeField()
+    ip = models.TextField(null=True)
 
     def get_dirname(self):
         path = os.path.join(settings.FILE_ROOT, str(self.file_id))
@@ -23,9 +24,11 @@ class ManiaFile(models.Model):
 
 class Task(models.Model):
     task_id = models.AutoField(primary_key=True)
-    status = models.TextField()  # ['queue', 'processinng', 'finish']
+    status = models.TextField()  # ['queue', 'processing', 'finish']
     start_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True)
     extras = models.TextField()
+    ip = models.TextField(null=True)
     beatmap_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='map')
     replay_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='replay')
     music_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='music',
