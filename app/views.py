@@ -128,10 +128,13 @@ def query(request: HttpRequest):
                 progress = 0.0
             return on_success({"type": "processing", "progress": progress})
         if task.status == "finish":
+            return on_success({"type": "finish", "filename": task.get_output_name()})
+        if task.status == "error":
             err_path = os.path.join(task.get_dirname(), "error.txt")
             if os.path.exists(err_path):
                 raise MessageException('\n'.join(open(err_path).readlines()))
-            return on_success({"type": "finish", "filename": task.get_output_name()})
+            else:
+                raise MessageException("Failed to generate video!")
 
     except Exception as e:
         return on_error(e)
@@ -196,7 +199,7 @@ def private_finish_task(request: HttpRequest):
         check_private_call(request)
         task_id = check_param('task_id', request.POST)
         task = Task.objects.get(task_id=task_id)
-        task.status = "finish"
+        task.status = "finish" if task.get_output_name() is not None else "error"
         task.save(force_update=True)
         return on_success({})
     except Exception as e:
