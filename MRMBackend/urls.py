@@ -15,14 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from MRMBackend import settings
 import app.views
 
 urlpatterns = [
-    path('mania/admin/', admin.site.urls),
-    path('mania/api/upload', app.views.upload),
-    path('mania/api/generate', app.views.generate),
-    path('mania/api/query', app.views.query),
-    path('mania/api/download', app.views.download),
-    path('mania/api/finish_task', app.views.private_finish_task),
-    path('mania/api/pop_queue', app.views.private_pop_queue),
+    path(settings.URL_PREFIX + 'admin/', admin.site.urls),
+    path(settings.URL_PREFIX + 'api/upload', app.views.upload),
+    path(settings.URL_PREFIX + 'api/generate', app.views.generate),
+    path(settings.URL_PREFIX + 'api/query', app.views.query),
+    path(settings.URL_PREFIX + 'api/download', app.views.download),
+    path(settings.URL_PREFIX + 'api/finish_task', app.views.private_finish_task),
+    path(settings.URL_PREFIX + 'api/pop_queue', app.views.private_pop_queue),
 ]

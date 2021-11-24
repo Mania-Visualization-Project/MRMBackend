@@ -22,6 +22,8 @@ WORKING_ROOT = BASE_DIR.joinpath("data", "working")
 
 MRM_PATH = BASE_DIR.joinpath("ManiaReplayMaster.jar")
 
+URL_PREFIX = "mania/"
+
 MAX_RUNNING_TASK = 1
 
 # Quick-start development settings - unsuitable for production
@@ -126,7 +128,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/' + URL_PREFIX + 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

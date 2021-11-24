@@ -50,6 +50,7 @@ def start_render(secret, end_point, mrm_path):
             print('Not render!')
             break
 
+        task_obj = task_obj['data']
         if task_obj['bgm'] is not None:
             shutil.copy(task_obj['bgm'], os.path.dirname(task_obj['map']))
 
@@ -68,15 +69,20 @@ def start_render(secret, end_point, mrm_path):
         with open(config_path, "w") as f:
             f.write(config_text)
 
+        out = open(os.path.join(work_dir, "render.log"), "w")
+
         subprocess.call([
             "java", "-jar",
             str(mrm_path),
             str(task_obj['map']),
             str(task_obj['replay']),
             config_path
-        ])
+        ], stdout=out, stderr=out)
 
-        print(requests.post(end_point + "finish_task", data={
+        out.write(str(requests.post(end_point + "finish_task", data={
             'secret_key': secret,
             'task_id': task_obj['task_id']
-        }).json())
+        }).json()))
+
+        out.close()
+
