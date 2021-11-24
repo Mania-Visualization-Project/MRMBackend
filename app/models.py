@@ -38,7 +38,7 @@ class Task(models.Model):
         return path
 
     def get_output_name(self):
-        dirname = task.get_dirname()
+        dirname = self.get_dirname()
         lst = list(filter(lambda x: x.endswith("mp4"), os.listdir(dirname)))
         if len(lst) > 0:
             return lst[0]
