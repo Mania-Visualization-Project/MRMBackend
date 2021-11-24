@@ -79,7 +79,8 @@
   "status": "OK",
   "error_message": "",
   "data": {
-    "type": "finish"
+    "type": "finish",
+    "filename": "xxx.mp4"
   }
 }
 ```

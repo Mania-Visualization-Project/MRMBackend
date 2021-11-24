@@ -131,7 +131,7 @@ def query(request: HttpRequest):
             err_path = os.path.join(task.get_dirname(), "error.txt")
             if os.path.exists(err_path):
                 raise MessageException('\n'.join(open(err_path).readlines()))
-            return on_success({"type": "finish"})
+            return on_success({"type": "finish", "filename": task.get_output_name()})
 
     except Exception as e:
         return on_error(e)
@@ -148,7 +148,7 @@ def download(request: HttpRequest):
             raise MessageException("Task doesn't finish!")
 
         dirname = task.get_dirname()
-        name = list(filter(lambda x: x.endswith("mp4"), os.listdir(dirname)))[0]
+        name = task.get_output_name()
 
         file = open(os.path.join(dirname, name), 'rb')
         response = FileResponse(file)
