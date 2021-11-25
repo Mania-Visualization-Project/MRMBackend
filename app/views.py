@@ -1,6 +1,7 @@
 # Create your views here.
 import json
 import os
+import time
 
 import user_agents
 from django.http import *
@@ -152,10 +153,15 @@ def query(request: HttpRequest):
             return on_success({"type": "queue", "count": running_count})
         if task.status == "processing":
             path = os.path.join(task.get_dirname(), "progress.txt")
+            progress = 0.0
             if os.path.exists(path):
-                progress = float(open(path).readlines()[0].strip())
-            else:
-                progress = 0.0
+                for retry in range(3):
+                    try:
+                        progress = float(open(path).readlines()[0].strip())
+                        break
+                    except:
+                        time.sleep(0.1)
+                        pass
             return on_success({"type": "processing", "progress": progress})
         if task.status == "finish":
             return on_success({"type": "finish", "filename": task.get_output_name()})

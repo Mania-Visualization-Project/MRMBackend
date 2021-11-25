@@ -60,13 +60,13 @@ def clean():
     current = timezone.now()
 
     for task in Task.objects.all():
-        if (current - task.start_time).seconds >= 24 * 3600:
+        if (current - task.start_time).total_seconds() >= 24 * 3600:
             dirname = task.get_dirname()
             Event(event_type="clean_task", event_message="id=%d" % task.task_id).save()
             shutil.rmtree(dirname)
 
     for mania_file in ManiaFile.objects.all():
-        if (current - mania_file.save_time).seconds >= 24 * 3600:
+        if (current - mania_file.save_time).total_seconds() >= 24 * 3600:
             shutil.rmtree(mania_file.get_dirname())
             Event(event_type="clean_file",
                   event_message="id=%d, type=%s" % (
