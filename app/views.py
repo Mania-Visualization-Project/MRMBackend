@@ -173,8 +173,7 @@ def download(request: HttpRequest):
 @csrf_exempt
 @require_http_methods("GET")
 def config(request: HttpRequest):
-    return HttpResponse(
-        "window.$$settings$$=" + json.dumps({
+    return on_success({
             "language": "zh",
             "speed": 15,
             "width": 540,
@@ -182,7 +181,6 @@ def config(request: HttpRequest):
             "fps": 60,
             "malody_platform": "PE"
         })
-    )
 
 
 def check_private_call(request: HttpRequest):
