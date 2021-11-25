@@ -2,6 +2,7 @@
 import json
 import os
 
+import user_agents
 from django.http import *
 from django.utils import timezone
 from django.views.decorators.csrf import *
@@ -23,13 +24,33 @@ def get_ip(request: HttpRequest):
     return request.META.get("REMOTE_ADDR", None)
 
 
+def get_user_agent(request: HttpRequest):
+    return request.META.get("HTTP_USER_AGENT", "NO_USER_AGENT")
+
+
+def record_crash():
+    import traceback
+    msg = traceback.format_exc()
+    Event(event_type="crash", event_message=msg).save()
+    return msg
+
+
+def is_cn(request: HttpRequest):
+    try:
+        accept_language = request.META.get("HTTP_ACCEPT_LANGUAGE", "").replace(" ", "")
+        for l in accept_language.split(","):
+            if 'zh;q=' in l and float(l.replace("zh;q=", "")) >= 0.5:
+                return True
+    except:
+        record_crash()
+        return False
+
+
 def on_error(exception: Exception):
     if type(exception) == MessageException:
         msg = exception.msg
     else:
-        import traceback
-        msg = traceback.format_exc()
-        Event(event_type="crash", event_message=msg).save()
+        msg = record_crash()
     return JsonResponse({"status": "error", "error_message": msg})
 
 
@@ -101,7 +122,9 @@ def generate(request: HttpRequest):
 
         task = Task(status="queue", start_time=timezone.now(), extras=json.dumps(extras),
                     beatmap_file=map_file, replay_file=replay_file, music_file=bgm_file,
-                    ip=get_ip(request), activate_time=timezone.now())
+                    ip=get_ip(request), activate_time=timezone.now(), environment=json.dumps({
+                "ua": get_user_agent(request)
+            }))
         task.save()
 
         util.start_render_process(request)
@@ -170,17 +193,19 @@ def download(request: HttpRequest):
     except Exception as e:
         return on_error(e)
 
+
 @csrf_exempt
 @require_http_methods("GET")
 def config(request: HttpRequest):
+    ua = user_agents.parse(get_user_agent(request))
     return on_success({
-            "language": "zh",
-            "speed": 15,
-            "width": 540,
-            "height": 960,
-            "fps": 60,
-            "malody_platform": "PE"
-        })
+        "language": "zh" if is_cn(request) else "en",
+        "speed": 15,
+        "width": 540,
+        "height": 960,
+        "fps": 60,
+        "malody_platform": "PC" if ua.is_pc else "PE"
+    })
 
 
 def check_private_call(request: HttpRequest):

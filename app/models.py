@@ -32,6 +32,7 @@ class Task(models.Model):
     activate_time = models.DateTimeField(null=True)
     extras = models.TextField()
     ip = models.TextField(null=True)
+    environment = models.TextField(null=True)
     beatmap_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='map')
     replay_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='replay')
     music_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='music',
