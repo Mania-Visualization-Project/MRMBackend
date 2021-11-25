@@ -170,6 +170,20 @@ def download(request: HttpRequest):
     except Exception as e:
         return on_error(e)
 
+@csrf_exempt
+@require_http_methods("GET")
+def config(request: HttpRequest):
+    return HttpResponse(
+        "window.$$settings$$=" + json.dumps({
+            "language": "zh",
+            "speed": 15,
+            "width": 540,
+            "height": 960,
+            "fps": 60,
+            "malody_platform": "PE"
+        })
+    )
+
 
 def check_private_call(request: HttpRequest):
     if request.POST.get('secret_key', '') != settings.SECRET_KEY:

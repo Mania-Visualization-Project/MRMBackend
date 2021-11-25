@@ -24,6 +24,7 @@ urlpatterns = [
     path(settings.URL_PREFIX + 'api/generate', app.views.generate),
     path(settings.URL_PREFIX + 'api/query', app.views.query),
     path(settings.URL_PREFIX + 'api/download', app.views.download),
+    path(settings.URL_PREFIX + 'api/config', app.views.config),
     path(settings.URL_PREFIX + 'api/finish_task', app.views.private_finish_task),
     path(settings.URL_PREFIX + 'api/pop_queue', app.views.private_pop_queue),
 ]
