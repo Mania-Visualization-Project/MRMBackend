@@ -66,3 +66,14 @@ class Event(models.Model):
     event_type = models.TextField()
     event_message = models.TextField()
     time = models.DateTimeField(null=True, auto_now=True)
+
+class Report(models.Model):
+    report_id = models.AutoField(primary_key=True)
+    beatmap = models.TextField()
+    replay = models.TextField()
+    bgm = models.TextField(null=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    error = models.TextField()
+    version = models.TextField()
+    ip = models.TextField(null=True)

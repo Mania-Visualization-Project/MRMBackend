@@ -2,6 +2,7 @@
 import json
 import os
 import time
+import datetime
 
 import user_agents
 from django.http import *
@@ -11,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from MRMBackend import settings
 from . import util
-from .models import ManiaFile, Task, Event
+from .models import ManiaFile, Task, Event, Report
 
 
 class MessageException(Exception):
@@ -106,7 +107,6 @@ def generate(request: HttpRequest):
 
     try:
         data = json.load(request)
-        print(data)
         map_id = check_param("map", data, required_type=int)
         map_file = ManiaFile.objects.get(file_id=int(map_id))
         check_file_type(map_file, "map")
@@ -212,6 +212,27 @@ def config(request: HttpRequest):
         "fps": 60,
         "malody_platform": "PC" if ua.is_pc else "PE"
     })
+
+@csrf_exempt
+@require_http_methods("POST")
+def report_task(request: HttpRequest):
+    try:
+        data = json.load(request)
+        map_name = check_param("map", data, required_type=str)
+        replay_name = check_param("replay", data, required_type=str)
+        bgm_name = check_param("bgm", data, required_type=str) if ("bgm" in data and data["bgm"] != "") else None
+        start_time = check_param("start_time", data, required_type=int) / 1000
+        end_time = check_param("end_time", data, required_type=int) / 1000
+        error = check_param("error", data, required_type=str)
+        version = check_param("version", data, required_type=str)
+        Report(beatmap=map_name, replay=replay_name, bgm=bgm_name,
+               start_time=datetime.datetime.fromtimestamp(start_time),
+               end_time=datetime.datetime.fromtimestamp(end_time),
+               error=error, ip=get_ip(request),
+               version=version).save()
+        return on_success({})
+    except Exception as e:
+        return on_error(e)
 
 
 def check_private_call(request: HttpRequest):
