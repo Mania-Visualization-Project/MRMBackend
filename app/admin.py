@@ -12,23 +12,22 @@ def format_time(dt: datetime.datetime):
 
 class ManiaFileAdmin(admin.ModelAdmin):
     list_display = ('file_id', 'file_type',
-                    'file_name', 'file_save_time', 'ip')
+                    'file_name', 'file_save_date_time', 'ip')
     list_filter = ('file_type',)
     def file_save_time(self, obj):
         return format_time(obj.save_time)
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('event_id', 'event_start_date_time', 'event_type', "event_message")
+    list_display = ('event_start_date_time', 'event_id', 'event_type', "event_message")
     list_filter = ('event_type',)
     def event_start_date_time(self, obj):
         return format_time(obj.time)
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('task_id', 'status',
-                    'beatmap', 'replay',
-                    'start_time_', 'duration', 'error_reason', "user_agent")
+    list_display = ('task_start_time', 'task_id', 'status',
+                    'beatmap', 'replay', 'duration', "user_agent")
     list_filter = ('status',)
 
 
@@ -41,7 +40,7 @@ class TaskAdmin(admin.ModelAdmin):
     def duration(self, obj):
         return str(obj.end_time - obj.start_time) if obj.end_time is not None else "-"
 
-    def start_time_(self, obj):
+    def task_start_time(self, obj):
         return format_time(obj.start_time)
 
     def user_agent(self, obj):
@@ -52,8 +51,8 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('error', 'beatmap_type', 'replay_type', 'version',
-                    'report_start_time', 'duration')
+    list_display = ('report_start_time', 'error', 'beatmap_type', 'replay_type',
+                    'version', 'duration')
     def duration(self, obj):
         return str(obj.end_time - obj.start_time)
     def beatmap_type(self, obj):
