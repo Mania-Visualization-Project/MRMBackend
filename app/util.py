@@ -1,6 +1,7 @@
 import multiprocessing
 import shutil
 import os
+import datetime
 
 from django.http import *
 from django.utils import timezone
@@ -60,16 +61,24 @@ def clean():
     last_clean_time = timezone.now()
     current = timezone.now()
 
-    for task in Task.objects.all():
-        dirname = task.get_dirname()
+    for task in Task.objects.filter(start_time__range=(
+            current - datetime.timedelta(days=7),
+            current - datetime.timedelta(days=1),
+    )):
+        print(task)
+        dirname = task.get_dirname(create=False)
         if not os.path.isdir(dirname):
             continue
         if (current - task.start_time).total_seconds() >= 24 * 3600:
             Event(event_type="clean_task", event_message="id=%d" % task.task_id).save()
             shutil.rmtree(dirname)
 
-    for mania_file in ManiaFile.objects.all():
-        dirname = mania_file.get_dirname()
+    for mania_file in ManiaFile.objects.filter(save_time__range=(
+            current - datetime.timedelta(days=7),
+            current - datetime.timedelta(days=1),
+    )):
+        print(mania_file)
+        dirname = mania_file.get_dirname(create=False)
         if not os.path.isdir(dirname):
             continue
         if (current - mania_file.save_time).total_seconds() >= 24 * 3600:

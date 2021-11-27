@@ -13,10 +13,11 @@ class ManiaFile(models.Model):
     save_time = models.DateTimeField()
     ip = models.TextField(null=True)
 
-    def get_dirname(self):
+    def get_dirname(self, create=True):
         path = os.path.join(settings.FILE_ROOT, str(self.file_id))
-        if not os.path.isdir(path):
-            os.makedirs(path)
+        if create:
+            if not os.path.isdir(path):
+                os.makedirs(path)
         return path
 
     def get_path(self):
@@ -38,10 +39,11 @@ class Task(models.Model):
     music_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='music',
                                    null=True, blank=True)
 
-    def get_dirname(self):
+    def get_dirname(self, create=True):
         path = os.path.join(settings.WORKING_ROOT, str(self.task_id))
-        if not os.path.isdir(path):
-            os.makedirs(path)
+        if create:
+            if not os.path.isdir(path):
+                os.makedirs(path)
         return path
 
     def get_output_name(self):

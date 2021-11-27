@@ -1,26 +1,34 @@
 import json
+import datetime
 
 import user_agents
 from django.contrib import admin
 
 from app.models import *
 
+def format_time(dt: datetime.datetime):
+    return (dt + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+
 
 class ManiaFileAdmin(admin.ModelAdmin):
     list_display = ('file_id', 'file_type',
-                    'file_name', 'save_time', 'ip')
+                    'file_name', 'file_save_time', 'ip')
     list_filter = ('file_type',)
+    def file_save_time(self, obj):
+        return format_time(obj.save_time)
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('event_id', 'time', 'event_type', "event_message")
+    list_display = ('event_id', 'event_start_date_time', 'event_type', "event_message")
     list_filter = ('event_type',)
+    def event_start_date_time(self, obj):
+        return format_time(obj.time)
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('status',
+    list_display = ('task_id', 'status',
                     'beatmap', 'replay',
-                    'start_time', 'duration', 'error_reason', "user_agent")
+                    'start_time_', 'duration', 'error_reason', "user_agent")
     list_filter = ('status',)
 
 
@@ -33,6 +41,9 @@ class TaskAdmin(admin.ModelAdmin):
     def duration(self, obj):
         return str(obj.end_time - obj.start_time) if obj.end_time is not None else "-"
 
+    def start_time_(self, obj):
+        return format_time(obj.start_time)
+
     def user_agent(self, obj):
         env = json.loads(obj.environment) if obj.environment is not None else None
         if env is None or "ua" not in env:
@@ -41,17 +52,16 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('report_id', 'beatmap_type',
-                    'replay_type', 'version',
-                    'start_time', 'duration', 'error', 'ip', 'has_error')
+    list_display = ('error', 'beatmap_type', 'replay_type', 'version',
+                    'report_start_time', 'duration')
     def duration(self, obj):
         return str(obj.end_time - obj.start_time)
     def beatmap_type(self, obj):
         return obj.beatmap.split(".")[-1]
     def replay_type(self, obj):
         return obj.replay.split(".")[-1]
-    def has_error(self, obj):
-        return obj.error is not None and obj.error != ""
+    def report_start_time(self, obj):
+        return format_time(obj.start_time)
 
 # Register your models here.
 admin.site.register(ManiaFile, ManiaFileAdmin)

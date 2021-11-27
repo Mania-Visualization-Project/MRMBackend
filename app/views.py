@@ -143,6 +143,8 @@ def query(request: HttpRequest):
         task_id = check_param("task_id", request.GET, required_type=int)
         task = Task.objects.get(task_id=int(task_id))
 
+        util.clean()
+
         util.check_too_long_task(request)
 
         # queue, processing, finish, error
@@ -210,7 +212,7 @@ def config(request: HttpRequest):
         "width": 540,
         "height": 960,
         "fps": 60,
-        "malody_platform": "PC" if ua.is_pc else "PE"
+        "malody_platform": "PC" if (ua.is_pc and "Mac" not in ua.get_os()) else "PE"
     })
 
 @csrf_exempt
