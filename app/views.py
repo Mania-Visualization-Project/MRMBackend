@@ -143,8 +143,6 @@ def query(request: HttpRequest):
         task_id = check_param("task_id", request.GET, required_type=int)
         task = Task.objects.get(task_id=int(task_id))
 
-        util.clean()
-
         util.check_too_long_task(request)
 
         # queue, processing, finish, error
