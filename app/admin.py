@@ -26,7 +26,7 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('task_start_time', 'task_id', 'status',
+    list_display = ('task_start_date_time', 'task_id', 'status',
                     'beatmap', 'replay', 'duration', "user_agent")
     list_filter = ('status',)
 
@@ -40,7 +40,7 @@ class TaskAdmin(admin.ModelAdmin):
     def duration(self, obj):
         return str(obj.end_time - obj.start_time) if obj.end_time is not None else "-"
 
-    def task_start_time(self, obj):
+    def task_start_date_time(self, obj):
         return format_time(obj.start_time)
 
     def user_agent(self, obj):
