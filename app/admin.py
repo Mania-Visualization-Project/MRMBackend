@@ -14,7 +14,7 @@ class ManiaFileAdmin(admin.ModelAdmin):
     list_display = ('file_id', 'file_type',
                     'file_name', 'file_save_date_time', 'ip')
     list_filter = ('file_type',)
-    def file_save_time(self, obj):
+    def file_save_date_time(self, obj):
         return format_time(obj.save_time)
 
 
@@ -51,7 +51,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('report_start_time', 'error', 'beatmap_type', 'replay_type',
+    list_display = ('report_start_date_time', 'error', 'beatmap_type', 'replay_type',
                     'version', 'duration')
     def duration(self, obj):
         return str(obj.end_time - obj.start_time)
@@ -59,7 +59,7 @@ class ReportAdmin(admin.ModelAdmin):
         return obj.beatmap.split(".")[-1]
     def replay_type(self, obj):
         return obj.replay.split(".")[-1]
-    def report_start_time(self, obj):
+    def report_start_date_time(self, obj):
         return format_time(obj.start_time)
 
 # Register your models here.
