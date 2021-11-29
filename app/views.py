@@ -217,7 +217,8 @@ def config(request: HttpRequest):
 @require_http_methods("POST")
 def report_task(request: HttpRequest):
     try:
-        data = json.load(request)
+        content = request.read()
+        data = json.loads(content)
         map_name = check_param("map", data, required_type=str)
         replay_name = check_param("replay", data, required_type=str)
         bgm_name = check_param("bgm", data, required_type=str) if ("bgm" in data and data["bgm"] != "") else None
