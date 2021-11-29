@@ -23,6 +23,9 @@ class ManiaFile(models.Model):
     def get_path(self):
         return os.path.join(self.get_dirname(), str(self.file_name))
 
+    def __str__(self):
+        return "[%d] %s" % (self.file_id, self.file_name)
+
 
 class Task(models.Model):
     task_id = models.AutoField(primary_key=True)
