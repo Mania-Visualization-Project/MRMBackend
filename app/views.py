@@ -206,7 +206,7 @@ def config(request: HttpRequest):
     ua = user_agents.parse(get_user_agent(request))
     return on_success({
         "language": "zh" if is_cn(request) else "en",
-        "speed": 15,
+        "speed": 20,
         "width": 540,
         "height": 960,
         "fps": 60,
