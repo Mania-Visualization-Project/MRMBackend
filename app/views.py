@@ -162,9 +162,11 @@ def query(request: HttpRequest):
                     except:
                         time.sleep(0.1)
                         pass
-            return on_success({"type": "processing", "progress": progress})
+            return on_success({"type": "processing", "progress": progress,
+                               "extra_": util.parse_task_extra(task.get_dirname())})
         if task.status == "finish":
-            return on_success({"type": "finish", "filename": task.get_output_name()})
+            return on_success({"type": "finish", "filename": task.get_output_name(),
+                               "extra_": util.parse_task_extra(task.get_dirname())})
         if task.status == "error":
             err_path = os.path.join(task.get_dirname(), "error.txt")
             if os.path.exists(err_path):

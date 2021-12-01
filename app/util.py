@@ -2,6 +2,7 @@ import multiprocessing
 import shutil
 import os
 import datetime
+import json
 
 from django.http import *
 from django.utils import timezone
@@ -50,6 +51,28 @@ def check_too_long_task(request: HttpRequest):
 
     if has_too_long_task:
         start_render_process(request)
+
+def parse_task_extra(task_dir):
+    extra_file = os.path.join(task_dir, "task_extra.json")
+    warning = {"is_music_mismatch": False, "is_replay_mismatch": False}
+    if os.path.exists(extra_file):
+        return json.load(open(extra_file))
+    render_log = os.path.join(task_dir, "render.log")
+    if not os.path.exists(render_log):
+        return warning
+    render_file = open(render_log, "r")
+    count = 0
+    while count <= 30:
+        count += 1
+        line = render_file.readline()
+        if line.startswith("WARNING: Music given in the map") or line.startswith("警告：谱面的音乐文"):
+            warning['is_music_mismatch'] = True
+        elif line.startswith("WARNING: The beatmap cannot match the") or line.startswith("警告：谱面和回放文件"):
+            warning['is_replay_mismatch'] = True
+    if count >= 30:
+        with open(extra_file, "w") as w:
+            json.dump(warning, w)
+    return warning
 
 
 def clean():

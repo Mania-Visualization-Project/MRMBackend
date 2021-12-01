@@ -69,7 +69,8 @@
   "error_message": "",
   "data": {
     "type": "processing",
-    "progress": 47.55
+    "progress": 47.55,
+    "extra_": {"is_music_mismatch": false, "is_replay_mismatch": false}
   }
 }
 ```
@@ -81,6 +82,7 @@
   "data": {
     "type": "finish",
     "filename": "xxx.mp4"
+    "extra_": {"is_music_mismatch": false, "is_replay_mismatch": false}
   }
 }
 ```
