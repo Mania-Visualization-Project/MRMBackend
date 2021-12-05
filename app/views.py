@@ -65,6 +65,7 @@ def on_error(exception: Exception):
             status = "error"
     else:
         msg = record_crash()
+        status = "error"
     return JsonResponse({"status": status, "error_message": msg})
 
 
