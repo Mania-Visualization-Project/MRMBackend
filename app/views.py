@@ -57,7 +57,7 @@ def on_error(exception: Exception):
             status = "beatmap_not_found"
         elif "Invalid beatmap file" in msg or "Invalid .mc file" in msg:
             status = "beatmap_invalid"
-        elif "Invalid replay file in msg" in msg or "not a valid .mr file" in msg:
+        elif "Invalid replay file" in msg or "not a valid .mr file" in msg:
             status = "replay_invalid"
         elif "connection close" in msg:
             status = "time_exceeded"
