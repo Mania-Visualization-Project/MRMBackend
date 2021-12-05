@@ -51,9 +51,21 @@ def is_cn(request: HttpRequest):
 def on_error(exception: Exception):
     if type(exception) == MessageException:
         msg = exception.msg
+        if "generated file fail" in msg:
+            status = "render_failed"
+        elif "Cannot find the beatmap with the given" in msg:
+            status = "beatmap_not_found"
+        elif "Invalid beatmap file" in msg or "Invalid .mc file" in msg:
+            status = "beatmap_invalid"
+        elif "Invalid replay file in msg" or "not a valid .mr file" in msg:
+            status = "replay_invalid"
+        elif "connection close" in msg:
+            status = "time_exceeded"
+        else:
+            status = "error"
     else:
         msg = record_crash()
-    return JsonResponse({"status": "error", "error_message": msg})
+    return JsonResponse({"status": status, "error_message": msg})
 
 
 def on_success(obj: dict):
@@ -172,7 +184,7 @@ def query(request: HttpRequest):
             if os.path.exists(err_path):
                 raise MessageException('\n'.join(open(err_path).readlines()))
             else:
-                raise MessageException("Failed to generate video!")
+                raise MessageException("Generated file fail")
 
     except Exception as e:
         return on_error(e)
