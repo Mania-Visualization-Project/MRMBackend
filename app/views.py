@@ -109,6 +109,13 @@ def upload(request: HttpRequest):
     except Exception as e:
         return on_error(e)
 
+def check_extras(extra):
+    w = extra.get("width", 540)
+    h = extra.get("height", 960)
+    fps = extra.get("fps", 60)
+    speed = extra.get("speed", 15)
+    if w * h > 1000000 or fps < 30 or fps > 240 or speed < 1 or speed > 40 or fps * speed > 3000:
+        raise MessageException("Invalid extras!")
 
 @csrf_exempt
 @require_http_methods("POST")
@@ -133,6 +140,7 @@ def generate(request: HttpRequest):
         replay_file = ManiaFile.objects.get(file_id=int(replay_id))
         check_file_type(replay_file, "replay")
         extras = check_param("extra", data, required_type=dict)
+        check_extras(extras)
 
         task = Task(status="queue", start_time=timezone.now(), extras=json.dumps(extras),
                     beatmap_file=map_file, replay_file=replay_file, music_file=bgm_file,
