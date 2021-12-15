@@ -57,9 +57,21 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('task_start_date_time', 'task_id', 'status',
+    list_display = ('task_start_date_time', 'game_mode', 'status',
                     'beatmap', 'replay', 'duration', "user_agent", "region")
     list_filter = ('status',)
+
+    def game_mode(self, obj):
+        replay_name = obj.replay_file.file_name
+        if replay_name.endswith('.mr'):
+            return "malody"
+        if replay_name.endswith('Taiko.osr'):
+            return "osu!taiko"
+        if replay_name.endswith('OsuMania.osr'):
+            return "osu!mania"
+        if replay_name.endswith(".osr"):
+            return "osu!"
+        return "??"
 
     def beatmap(self, obj):
         return "[%d] " % obj.beatmap_file.file_id + obj.beatmap_file.file_name.split(".")[-1]

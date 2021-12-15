@@ -51,7 +51,7 @@ def is_cn(request: HttpRequest):
 def on_error(exception: Exception):
     if type(exception) == MessageException:
         msg = exception.msg
-        if "generated file fail" in msg:
+        if "enerated file fail" in msg:
             status = "render_failed"
         elif "Cannot find the beatmap with the given" in msg:
             status = "beatmap_not_found"
