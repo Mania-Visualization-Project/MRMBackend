@@ -241,7 +241,8 @@ def config(request: HttpRequest):
 def latest(request: HttpRequest):
     return on_success({
         "version": "2.2.2",
-        "package_url": "https://mania-replay-master-1305818561.cos.ap-shanghai.myqcloud.com/ManiaReplayMaster%20v2.2.2.zip"
+        "package_url": "https://mania-replay-master-1305818561.cos.ap-shanghai.myqcloud.com/ManiaReplayMaster%20v2.2.2.zip",
+        "package_name": "ManiaReplayMaster v2.2.2.zip"
     })
 
 @csrf_exempt
