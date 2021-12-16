@@ -65,11 +65,11 @@ class TaskAdmin(admin.ModelAdmin):
         replay_name = obj.replay_file.file_name
         if replay_name.endswith('.mr'):
             return "malody"
-        if replay_name.endswith('Taiko.osr'):
-            return "osu!taiko"
-        if replay_name.endswith('OsuMania.osr'):
-            return "osu!mania"
         if replay_name.endswith(".osr"):
+            if 'Taiko' in replay_name:
+                return "osu!taiko"
+            if 'OsuMania' in replay_name:
+                return "osu!mania"
             return "osu!"
         return "??"
 
