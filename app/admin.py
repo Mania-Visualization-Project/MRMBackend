@@ -52,6 +52,8 @@ class EventAdmin(admin.ModelAdmin):
     def event_start_date_time(self, obj):
         return format_time(obj.time)
 
+class IPRegionAdmin(admin.ModelAdmin):
+    list_display = ('ip', 'country', 'area')
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('task_start_date_time', 'game_mode', 'status',
@@ -120,4 +122,4 @@ admin.site.register(ManiaFile, ManiaFileAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Report, ReportAdmin)
-admin.site.register(IPRegion)
+admin.site.register(IPRegion, IPRegionAdmin)
