@@ -17,22 +17,19 @@ cache_validate_date = None
 
 
 def ip_to_region(ip):
-    global ip_cache, cache_validate_date
-    now = datetime.datetime.now()
-    if cache_validate_date is None or (
-            now - cache_validate_date).total_seconds() >= 3600 * 24:
-        ip_cache = {}
-        cache_validate_date = now
-    if ip in ip_cache:
-        return ip_cache[ip]
-    region = "-"
-    try:
-        data = requests.get("https://www.svlik.com/t/ipapi/ip.php?ip=" + ip).json()
-        region = data['country'] + data['area']
-    except:
-        pass
-    ip_cache[ip] = region
-    return region
+    ip_region = IPRegion.objects.filter(ip=ip).first()
+    if ip_region is None:
+        try:
+            data = requests.get("https://www.svlik.com/t/ipapi/ip.php?ip=" + ip).json()
+            print(data)
+            ip_region = IPRegion(ip=ip, country=data['country'], area=data['area'])
+            ip_region.save()
+        except:
+            pass
+    if ip_region is None:
+        return "-"
+    else:
+        return ip_region.get_region()
 
 
 
@@ -123,3 +120,4 @@ admin.site.register(ManiaFile, ManiaFileAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Report, ReportAdmin)
+admin.site.register(IPRegion)

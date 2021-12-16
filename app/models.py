@@ -82,3 +82,12 @@ class Report(models.Model):
     error = models.TextField()
     version = models.TextField()
     ip = models.TextField(null=True)
+
+
+class IPRegion(models.Model):
+    ip = models.TextField(primary_key=True)
+    country = models.TextField(null=True)
+    area = models.TextField(null=True)
+
+    def get_region(self):
+        return str(self.country) + ": " + str(self.area)
