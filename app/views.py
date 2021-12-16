@@ -266,10 +266,21 @@ def report_task(request: HttpRequest):
         end_time = check_param("end_time", data, required_type=int) / 1000
         error = check_param("error", data, required_type=str)
         version = check_param("version", data, required_type=str)
+        if 'game_mode' in data:
+            game_mode = data['game_mode']
+        else:
+            game_mode = util.parse_game_mode_from_replay(replay_name)
+
+        if 'extra' in data:
+            extra = data['extra']
+        else:
+            extra = None
+
         Report(beatmap=map_name, replay=replay_name, bgm=bgm_name,
                start_time=datetime.datetime.fromtimestamp(start_time),
                end_time=datetime.datetime.fromtimestamp(end_time),
                error=error, ip=get_ip(request),
+               game_mode=game_mode, extra=extra,
                version=version).save()
         return on_success({})
     except Exception as e:
@@ -322,6 +333,9 @@ def private_finish_task(request: HttpRequest):
         task_id = check_param('task_id', request.POST)
         task = Task.objects.get(task_id=task_id)
         task.status = "finish" if task.get_output_name() is not None else "error"
+        game_mode_file = os.path.join(task.get_dirname(), "game_mode.txt")
+        if os.path.exists(game_mode_file):
+            task.game_mode = open(game_mode_file).read()
         task.end_time = timezone.now()
         task.save(force_update=True)
 

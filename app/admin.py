@@ -6,6 +6,7 @@ import user_agents
 from django.contrib import admin
 
 from app.models import *
+from app import util
 
 
 def format_time(dt: datetime.datetime):
@@ -56,21 +57,16 @@ class IPRegionAdmin(admin.ModelAdmin):
     list_display = ('ip', 'country', 'area')
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('task_start_date_time', 'game_mode', 'status',
+    list_display = ('task_start_date_time', 'game_mode_display', 'status',
                     'beatmap', 'replay', 'duration', "user_agent", "region")
     list_filter = ('status',)
 
-    def game_mode(self, obj):
-        replay_name = obj.replay_file.file_name
-        if replay_name.endswith('.mr'):
-            return "malody"
-        if replay_name.endswith(".osr"):
-            if 'Taiko' in replay_name:
-                return "osu!taiko"
-            if 'OsuMania' in replay_name:
-                return "osu!mania"
-            return "osu!"
-        return "??"
+    def game_mode_display(self, obj):
+        if obj.game_mode is None:
+            replay_name = obj.replay_file.file_name
+            return util.parse_game_mode_from_replay(replay_name)
+        else:
+            return obj.game_mode
 
     def beatmap(self, obj):
         return "[%d] " % obj.beatmap_file.file_id + obj.beatmap_file.file_name.split(".")[-1]
@@ -95,8 +91,15 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('report_start_date_time', 'has_error', 'beatmap_type', 'replay_type',
+    list_display = ('report_start_date_time', 'has_error', 'game_mode_display', 'beatmap_type', 'replay_type',
                     'version', 'duration', 'region')
+
+    def game_mode_display(self, obj):
+        if obj.game_mode is None:
+            replay_name = obj.replay
+            return util.parse_game_mode_from_replay(replay_name)
+        else:
+            return obj.game_mode
 
     def duration(self, obj):
         return str(obj.end_time - obj.start_time)

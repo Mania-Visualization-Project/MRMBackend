@@ -109,3 +109,16 @@ def clean():
             Event(event_type="clean_file",
                   event_message="id=%d, type=%s" % (
                   mania_file.file_id, mania_file.file_type)).save()
+
+
+def parse_game_mode_from_replay(replay_name):
+    print("parse_game_mode_from_replay" + replay_name)
+    if replay_name.endswith('.mr'):
+        return "malody:key"
+    if replay_name.endswith(".osr"):
+        if 'Taiko' in replay_name:
+            return "osu!taiko"
+        if 'OsuMania' in replay_name:
+            return "osu!mania"
+        return "osu!mania"
+    return "??"

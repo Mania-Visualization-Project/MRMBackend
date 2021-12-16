@@ -37,6 +37,7 @@ class Task(models.Model):
     extras = models.TextField()
     ip = models.TextField(null=True)
     environment = models.TextField(null=True)
+    game_mode = models.TextField(null=True)
     beatmap_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='map')
     replay_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='replay')
     music_file = models.ForeignKey(ManiaFile, on_delete=models.CASCADE, related_name='music',
@@ -81,6 +82,8 @@ class Report(models.Model):
     end_time = models.DateTimeField()
     error = models.TextField()
     version = models.TextField()
+    game_mode = models.TextField(null=True)
+    extra = models.TextField(null=True)
     ip = models.TextField(null=True)
 
 
