@@ -51,18 +51,23 @@ def is_cn(request: HttpRequest):
 def on_error(exception: Exception):
     if type(exception) == MessageException:
         msg = exception.msg
-        if "enerated file fail" in msg:
-            status = "render_failed"
-        elif "Cannot find the beatmap with the given" in msg:
-            status = "beatmap_not_found"
-        elif "Invalid beatmap file" in msg or "Invalid .mc file" in msg:
-            status = "beatmap_invalid"
-        elif "Invalid replay file" in msg or "not a valid .mr file" in msg:
-            status = "replay_invalid"
-        elif "connection close" in msg:
-            status = "time_exceeded"
+        if "error code:" in msg:
+            elements = msg.split("error code:")
+            status = elements[-1].strip()
+            msg = "error code:".join(elements[:-1]).strip()
         else:
-            status = "error"
+            if "enerated file fail" in msg:
+                status = "render_failed"
+            elif "Cannot find the beatmap with the given" in msg:
+                status = "beatmap_not_found"
+            elif "Invalid beatmap file" in msg or "Invalid .mc file" in msg:
+                status = "beatmap_invalid"
+            elif "Invalid replay file" in msg or "not a valid .mr file" in msg:
+                status = "replay_invalid"
+            elif "connection close" in msg:
+                status = "time_exceeded"
+            else:
+                status = "error"
     else:
         msg = record_crash()
         status = "error"
