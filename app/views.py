@@ -258,7 +258,9 @@ def report_task(request: HttpRequest):
         try:
             data = json.loads(content)
         except:
-            data = json.loads(content.decode('utf-8', 'backslashreplace'))
+            content = content.decode('utf-8', 'backslashreplace')
+            Event(event_type="decode_err", event_message=content).save()
+            data = json.loads(content)
         map_name = check_param("map", data, required_type=str)
         replay_name = check_param("replay", data, required_type=str)
         bgm_name = check_param("bgm", data, required_type=str) if ("bgm" in data and data["bgm"] != "") else None
