@@ -88,14 +88,14 @@ def clean():
     current = timezone.now()
 
     for task in Task.objects.filter(start_time__range=(
+            current - datetime.timedelta(days=14),
             current - datetime.timedelta(days=7),
-            current - datetime.timedelta(days=1),
     )):
         print(task)
         dirname = task.get_dirname(create=False)
         if not os.path.isdir(dirname):
             continue
-        if (current - task.start_time).total_seconds() >= 24 * 3600:
+        if (current - task.start_time).total_seconds() >= 24 * 3600 * 7:
             Event(event_type="clean_task", event_message="id=%d" % task.task_id).save()
             shutil.rmtree(dirname)
 
