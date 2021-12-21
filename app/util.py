@@ -2,6 +2,7 @@ import multiprocessing
 import shutil
 import os
 import datetime
+import time
 import json
 
 from django.http import *
@@ -125,3 +126,18 @@ def parse_game_mode_from_replay(replay_name):
             return "osu!mania"
         return "osu!mania"
     return "??"
+
+memory_cache = {}
+
+def get_from_cache(key, expire_seconds, default_func):
+    global memory_cache
+    current = time.time()
+    if key in memory_cache:
+        content, save_time = memory_cache[key]
+        if current - save_time < expire_seconds:
+            print("[CACHE-%s] hit" % key)
+            return content
+        print("[CACHE-%s] expired!" % key)
+    memory_cache[key] = (default_func(), current)
+    print("[CACHE-%s] default!" % key)
+    return default_func()

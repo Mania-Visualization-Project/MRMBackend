@@ -4,6 +4,7 @@ import datetime
 
 import user_agents
 from django.contrib import admin
+from django.utils.html import format_html
 
 from app.models import *
 from app import util
@@ -33,7 +34,6 @@ def ip_to_region(ip):
         return ip_region.get_region()
 
 
-
 class ManiaFileAdmin(admin.ModelAdmin):
     list_display = ('file_id', 'file_type',
                     'file_name', 'file_save_date_time', 'region')
@@ -53,13 +53,41 @@ class EventAdmin(admin.ModelAdmin):
     def event_start_date_time(self, obj):
         return format_time(obj.time)
 
+
 class IPRegionAdmin(admin.ModelAdmin):
-    list_display = ('ip', 'country', 'area')
+    list_display = ('ip', 'country', 'area', 'online_pv', 'offline_pv', 'total_pv')
+
+    def online_pv_int(self, ip):
+        return util.get_from_cache('online_pv', 10, default_func=lambda: list(map(
+            lambda x: x['ip'],
+            Task.objects.all().values('ip')
+        ))).count(ip)
+
+    def online_pv(self, obj):
+        online_pv_list = self.online_pv_int(obj.ip)
+        return format_html('<a href="%s">%d</a>' % ('/mania/admin/app/task/?q=' + obj.ip, online_pv_list))
+
+    online_pv.allow_tags = True
+
+    def offline_pv_int(self, ip):
+        return util.get_from_cache('offline_pv', 10, default_func=lambda: list(map(
+            lambda x: x['ip'],
+            Report.objects.all().values('ip')
+        ))).count(ip)
+
+    def offline_pv(self, obj):
+        online_pv_list = self.offline_pv_int(obj.ip)
+        return format_html('<a href="%s">%d</a>' % ('/mania/admin/app/report/?q=' + obj.ip, online_pv_list))
+
+    def total_pv(self, obj):
+        return self.online_pv_int(obj.ip) + self.offline_pv_int(obj.ip)
+
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('task_start_date_time', 'game_mode_display', 'status',
                     'beatmap', 'replay', 'duration', "user_agent", "region")
     list_filter = ('status',)
+    search_fields = ('ip',)
 
     def game_mode_display(self, obj):
         if obj.game_mode is None:
@@ -91,8 +119,10 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('report_start_date_time', 'has_error', 'game_mode_display', 'beatmap_type', 'replay_type',
-                    'version', 'duration', 'region')
+    list_display = (
+    'report_start_date_time', 'has_error', 'game_mode_display', 'beatmap_type', 'replay_type',
+    'version', 'duration', 'region')
+    search_fields = ('ip',)
 
     def game_mode_display(self, obj):
         if obj.game_mode is None:
