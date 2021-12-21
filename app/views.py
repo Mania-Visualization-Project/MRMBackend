@@ -340,7 +340,7 @@ def private_finish_task(request: HttpRequest):
         task.error_reason = ""
         if os.path.exists(err_path):
             task.error_reason = open(err_path).read()
-        extra_file = os.path.join(task_dir, "task_extra.json")
+        extra_file = os.path.join(task.get_dirname(), "task_extra.json")
         if os.path.exists(extra_file):
             task.error_reason = "\n" + open(extra_file).read()
         game_mode_file = os.path.join(task.get_dirname(), "game_mode.txt")
