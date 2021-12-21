@@ -96,6 +96,15 @@
 }
 ```
 
+### Terminate
+`GET` api/terminate
+#### parameters
+```
+{
+  "task_id": "xxx"
+}
+```
+
 ## Status
 |status            | ZH message                                                         |
 |-------------------|--------------------------------------------------------------------|
