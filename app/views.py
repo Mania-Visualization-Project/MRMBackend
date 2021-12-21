@@ -173,10 +173,10 @@ def query(request: HttpRequest):
 
         # queue, processing, finish, error
         if task.status == "queue":
-            running_count = len(list(Task.objects.filter(status="processing")))
+            queue_count = len(list(Task.objects.filter(status="queue")))
             task.activate_time = timezone.now()
             task.save(force_update=True)
-            return on_success({"type": "queue", "count": running_count})
+            return on_success({"type": "queue", "count": queue_count + 1})
         if task.status == "processing":
             path = os.path.join(task.get_dirname(), "progress.txt")
             progress = 0.0
