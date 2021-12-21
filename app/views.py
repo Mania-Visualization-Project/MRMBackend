@@ -337,8 +337,12 @@ def private_finish_task(request: HttpRequest):
         task = Task.objects.get(task_id=task_id)
         task.status = "finish" if task.get_output_name() is not None else "error"
         err_path = os.path.join(task.get_dirname(), "error.txt")
+        task.error_reason = ""
         if os.path.exists(err_path):
             task.error_reason = open(err_path).read()
+        extra_file = os.path.join(task_dir, "task_extra.json")
+        if os.path.exists(extra_file):
+            task.error_reason = "\n" + open(extra_file).read()
         game_mode_file = os.path.join(task.get_dirname(), "game_mode.txt")
         if os.path.exists(game_mode_file):
             task.game_mode = open(game_mode_file).read()
