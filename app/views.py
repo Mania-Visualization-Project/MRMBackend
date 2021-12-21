@@ -170,9 +170,9 @@ def terminate(request: HttpRequest):
         task = Task.objects.get(task_id=int(task_id))
 
         if task.status == 'processing':
-            util.kill_render_process([task_id])
             task.set_to_error("killed")
             task.save(force_update=True)
+            util.kill_render_process([task_id])
             util.start_render_process(request)
 
             return on_success({"is_running": True})
