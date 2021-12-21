@@ -163,6 +163,25 @@ def generate(request: HttpRequest):
 
 
 @csrf_exempt
+@require_http_methods("POST")
+def terminate(request: HttpRequest):
+    try:
+        task_id = check_param("task_id", request.GET, required_type=int)
+        task = Task.objects.get(task_id=int(task_id))
+
+        if task.status == 'processing':
+            util.kill_render_process([task_id])
+            task.set_to_error("killed")
+            task.save(force_update=True)
+            util.start_render_process(request)
+
+            return on_success({"is_running": True})
+        else:
+            return on_success({"is_running": False})
+    except Exception as e:
+        return on_error(e)
+
+@csrf_exempt
 @require_http_methods("GET")
 def query(request: HttpRequest):
     try:
@@ -180,6 +199,8 @@ def query(request: HttpRequest):
         if task.status == "processing":
             path = os.path.join(task.get_dirname(), "progress.txt")
             progress = 0.0
+            task.activate_time = timezone.now()
+            task.save(force_update=True)
             if os.path.exists(path):
                 for retry in range(3):
                     try:
@@ -304,7 +325,7 @@ def private_pop_queue(request: HttpRequest):
             raise MessageException("too much working processes!")
         task = None
         for t in Task.objects.filter(status="queue").order_by("-start_time"):
-            if t.activate_time is not None and (timezone.now() - t.activate_time).seconds >= 60:
+            if not t.is_connecting():
                 t.set_to_error("connection close")
                 t.save(force_update=True)
             else:

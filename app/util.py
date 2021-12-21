@@ -4,6 +4,7 @@ import os
 import datetime
 import time
 import json
+from psutil import Process
 
 from django.http import *
 from django.utils import timezone
@@ -12,6 +13,8 @@ from MRMBackend import settings
 from .models import Task, Event, ManiaFile
 from .worker import start_render
 
+
+render_process_pool = []
 
 def start_render_process(request):
     p = multiprocessing.Process(target=start_render,
@@ -22,6 +25,34 @@ def start_render_process(request):
                                           prefix=settings.URL_PREFIX),
                                       settings.MRM_PATH))
     p.start()
+    render_process_pool.append(p)
+
+
+def kill_process(prefix, process: Process):
+    try:
+        meta =  "[%d] %s %s" % (process.pid, process.name(), prefix)
+        process.kill()
+        Event(event_type="kill_process", event_message=meta).save()
+    except:
+        pass
+
+
+def kill_render_process(task_ids):
+    global render_process_pool
+    for p in render_process_pool:
+        if p.is_alive:
+            try:
+                parent = Process(p.pid)
+                for child in parent.children(recursive=True):
+                    kill_process(str(task_ids), child)
+                kill_process(str(task_ids), parent)
+            except:
+                import traceback
+                msg = traceback.format_exc()
+                meta = "[%d] %s" % (p.pid, str(task_ids))
+                Event(event_type="kill_failed", event_message=meta + "\n" + msg).save()
+
+    render_process_pool.clear()
 
 
 last_check_time = None
@@ -43,14 +74,21 @@ def check_too_long_task(request: HttpRequest):
     has_too_long_task = False
     now = timezone.now()
 
+    error_task_ids = []
     for task in processing_tasks:
         offset = (now - task.start_time).seconds
         if offset >= 1800:
+            error_task_ids.append(task.task_id)
             task.set_to_error("time out")
+            task.save(force_update=True)
+            has_too_long_task = True
+        elif not task.is_connecting():
+            task.set_to_error("connection close (processing)")
             task.save(force_update=True)
             has_too_long_task = True
 
     if has_too_long_task:
+        kill_render_process(error_task_ids)
         start_render_process(request)
 
 def parse_task_extra(task_dir):

@@ -24,6 +24,7 @@ urlpatterns = [
     path(settings.URL_PREFIX + 'api/generate', app.views.generate),
     path(settings.URL_PREFIX + 'api/query', app.views.query),
     path(settings.URL_PREFIX + 'api/download', app.views.download),
+    path(settings.URL_PREFIX + 'api/terminate', app.views.terminate),
     path(settings.URL_PREFIX + 'api/config', app.views.config),
     path(settings.URL_PREFIX + 'api/latest', app.views.latest),
     path(settings.URL_PREFIX + 'api/report_offline', app.views.report_task),

@@ -66,6 +66,9 @@ class Task(models.Model):
             with open(err_path, "w") as f:
                 f.write(reason)
 
+    def is_connecting(self):
+        return self.activate_time is None or (timezone.now() - self.activate_time).seconds < 30
+
 
 class Event(models.Model):
     event_id = models.AutoField(primary_key=True)
