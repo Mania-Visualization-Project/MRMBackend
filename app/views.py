@@ -176,7 +176,9 @@ def terminate(request: HttpRequest):
             util.start_render_process(request)
 
             return on_success({"is_running": True})
-        else:
+        elif task.status == 'queue':
+            task.set_to_error("killed (queue)")
+            task.save(force_update=True)
             return on_success({"is_running": False})
     except Exception as e:
         return on_error(e)

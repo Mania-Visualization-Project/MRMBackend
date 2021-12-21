@@ -97,7 +97,7 @@
 ```
 
 ### Terminate
-`GET` api/terminate
+`POST` api/terminate
 #### parameters
 ```
 {
