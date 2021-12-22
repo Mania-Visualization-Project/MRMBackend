@@ -198,10 +198,14 @@ def query(request: HttpRequest):
 
         # queue, processing, finish, error
         if task.status == "queue":
-            queue_count = len(list(Task.objects.filter(status="queue")))
+            queue_count = Task.objects\
+                              .filter(status="queue")\
+                              .filter(start_time__lt=task.start_time)\
+                              .count()
+            processing_count = Task.objects.filter(status="processing").count()
             task.activate_time = timezone.now()
             task.save(force_update=True)
-            return on_success({"type": "queue", "count": queue_count})
+            return on_success({"type": "queue", "count": queue_count + processing_count})
         if task.status == "processing":
             path = os.path.join(task.get_dirname(), "progress.txt")
             progress = 0.0
@@ -330,7 +334,7 @@ def private_pop_queue(request: HttpRequest):
         if Task.objects.filter(status="processing").count() >= settings.MAX_RUNNING_TASK:
             raise MessageException("too much working processes!")
         task = None
-        for t in Task.objects.filter(status="queue").order_by("-start_time"):
+        for t in Task.objects.filter(status="queue").order_by("start_time"):
             if not t.is_connecting():
                 t.set_to_error("connection close")
                 t.save(force_update=True)
