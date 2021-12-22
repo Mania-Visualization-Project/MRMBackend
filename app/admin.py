@@ -29,9 +29,11 @@ def ip_to_region(ip):
         except:
             pass
     if ip_region is None:
-        return "-"
+        region = "-"
     else:
-        return ip_region.get_region()
+        region = ip_region.get_region()
+    return format_html('<a href="%s">%s</a>' % ('/mania/admin/app/ipregion/?q=' + ip, region))
+
 
 
 class ManiaFileAdmin(admin.ModelAdmin):
@@ -56,6 +58,7 @@ class EventAdmin(admin.ModelAdmin):
 
 class IPRegionAdmin(admin.ModelAdmin):
     list_display = ('ip', 'country', 'area', 'online_pv', 'offline_pv', 'total_pv')
+    search_fields = ('ip', 'country', 'area')
 
     def online_pv_int(self, ip):
         return util.get_from_cache('online_pv', 10, default_func=lambda: list(map(
