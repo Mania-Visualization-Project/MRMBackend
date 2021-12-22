@@ -66,6 +66,8 @@ def on_error(exception: Exception):
                 status = "replay_invalid"
             elif "connection close" in msg:
                 status = "time_exceeded"
+            elif "killed" in msg:
+                status = "killed"
             else:
                 status = "error"
     else:
@@ -180,6 +182,8 @@ def terminate(request: HttpRequest):
             task.set_to_error("killed (queue)")
             task.save(force_update=True)
             return on_success({"is_running": False})
+        else:
+            raise MessageException("cannot kill a terminating task")
     except Exception as e:
         return on_error(e)
 

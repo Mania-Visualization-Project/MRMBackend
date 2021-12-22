@@ -40,7 +40,7 @@ def kill_process(prefix, process: Process):
 def kill_render_process(task_ids):
     global render_process_pool
     for p in render_process_pool:
-        if p.is_alive:
+        if p.is_alive():
             try:
                 parent = Process(p.pid)
                 for child in parent.children(recursive=True):
