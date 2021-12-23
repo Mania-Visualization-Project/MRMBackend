@@ -115,3 +115,4 @@
 | replay_invalid    | 回放文件格式不正确！请检查您的回放文件。                           |
 | beatmap_invalid   | 谱面文件格式不正确！请检查您的谱面文件。                           |
 | time_exceeded     | 与服务器连接超时。请重试。                                         |
+| duration_too_long | 暂不支持超过半小时的谱面。                                         |
