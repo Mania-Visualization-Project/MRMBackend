@@ -154,7 +154,6 @@ def clean():
 
 
 def parse_game_mode_from_replay(replay_name):
-    print("parse_game_mode_from_replay" + replay_name)
     if replay_name.endswith('.mr'):
         return "malody:key"
     if replay_name.endswith(".osr"):

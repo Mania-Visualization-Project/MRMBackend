@@ -36,6 +36,7 @@ outputDir: '{output}'
 codec: libx264
 debug: true
 server: true
+maxEnabledDuration: 1800000
 """
 
 
