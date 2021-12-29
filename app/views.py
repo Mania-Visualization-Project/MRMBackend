@@ -282,6 +282,15 @@ def latest(request: HttpRequest):
     })
 
 @csrf_exempt
+@require_http_methods("GET")
+def osu_oauth(request: HttpRequest):
+    if 'code' not in request.GET:
+        return HttpResponseRedirect("https://osu.ppy.sh/oauth/authorize?client_id=11678&redirect_uri=http://keytoix.vip/mania/api/osu-oauth&response_type=code")
+    else:
+        return HttpResponse(content=request.GET['code'])
+
+
+@csrf_exempt
 @require_http_methods("POST")
 def report_task(request: HttpRequest):
     try:
