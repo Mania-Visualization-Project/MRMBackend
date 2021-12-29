@@ -285,7 +285,7 @@ def latest(request: HttpRequest):
 @require_http_methods("GET")
 def osu_oauth(request: HttpRequest):
     if 'code' not in request.GET:
-        return HttpResponseRedirect("https://osu.ppy.sh/oauth/authorize?client_id=11678&redirect_uri=http://keytoix.vip/mania/api/osu-oauth&response_type=code")
+        return HttpResponseRedirect("https://osu.ppy.sh/oauth/authorize?client_id=11678&redirect_uri=http://keytoix.vip/mania/api/osu-oauth&response_type=code&scope=public%20identify")
     else:
         return HttpResponse(content=request.GET['code'])
 
