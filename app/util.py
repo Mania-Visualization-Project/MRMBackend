@@ -93,9 +93,9 @@ def check_too_long_task(request: HttpRequest):
 
 def parse_task_extra(task_dir):
     print('task_dir', task_dir)
-    extra_file = os.path.join(task_dir, "task_extra.json")
-    if os.path.exists(extra_file):
-        return json.load(open(extra_file))
+    # extra_file = os.path.join(task_dir, "task_extra.json")
+    # if os.path.exists(extra_file):
+    #     return json.load(open(extra_file))
     render_log = os.path.join(task_dir, "render.log")
     game_mode_file = os.path.join(task_dir, "game_mode.txt")
     warning = {"is_music_mismatch": False, "is_replay_mismatch": False, "game_mode": "unknown"}
