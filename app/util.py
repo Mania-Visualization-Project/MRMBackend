@@ -92,6 +92,7 @@ def check_too_long_task(request: HttpRequest):
         start_render_process(request)
 
 def parse_task_extra(task_dir):
+    print('task_dir', task_dir)
     extra_file = os.path.join(task_dir, "task_extra.json")
     if os.path.exists(extra_file):
         return json.load(open(extra_file))
