@@ -113,8 +113,9 @@ def parse_task_extra(task_dir):
         elif line.startswith("WARNING: The beatmap cannot match the") or line.startswith("警告：谱面和回放文件"):
             warning['is_replay_mismatch'] = True
     if count >= 30:
-        with open(extra_file, "w") as w:
-            json.dump(warning, w)
+        pass
+        # with open(extra_file, "w") as w:
+        #     json.dump(warning, w)
     return warning
 
 
