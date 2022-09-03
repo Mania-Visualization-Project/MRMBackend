@@ -165,6 +165,17 @@ def generate(request: HttpRequest):
 
 
 @csrf_exempt
+@require_http_methods("GET")
+def count_videos(request: HttpRequest):
+    return JsonResponse({
+        "schemaVersion": 1,
+        "label": "render",
+        "message": "{:,} videos".format(Task.objects.count() + Report.objects.count()),
+        "color": "blueviolet",
+        "cacheSeconds": 3600
+    })
+
+@csrf_exempt
 @require_http_methods("POST")
 def terminate(request: HttpRequest):
     try:
